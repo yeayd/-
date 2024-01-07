@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>25분 뽀모도로</title>
+  <link rel="stylesheet" href="뽀모도로_style.css">	
+</head>
+<body>
+
+  <div id="h2">
+    25분 뽀모도로
+  </div>
+
+  <div id="words">
+    집중할 시간입니다 <br> 격하게 집중하세요.
+  </div>
+
+  <div id="content">
+    <div id="timer">
+      <!-- 타이머 요소들은 여기에 입력합니다. -->
+      <div id="progress_1"></div>
+      <div id="static-progress_1"></div>
+      <div id="static-progress_2"></div>
+      <div id="progress_2"></div>
+      <div id="progress_3"></div>
+      
+      <div id="timeDisplay">25:00</div> <!-- 남은 시간을 나타낼 요소 -->
+    </div>
+
+    <div id="button">
+        <button type="button" class="buttons" onclick="startTimer()">시작</button>
+        &nbsp;
+        <button type="button" class="buttons" onclick="stopTimer()">중지</button>
+        <button type="button" class="buttons" onclick="resetTimer()">초기화</button>
+        <br>
+        <div id="rest">
+          <a href="1분_뽀모도로.html"><button type="button" class="buttons" id="home">1분</button></a>
+          <a href="5분_뽀모도로.html"><button type="button" class="buttons" id="home">5분</button></a>
+        </div>
+        <a href="뽀모도로_홈화면.html"><button type="button" class="buttons" id="home">홈 화면</button></a>
+    </div>
+  </div>
+
+  <script>
+    let timeleft = 1500; // 25분을 초 단위로 표시
+    let timerInterval;
+    let currentProgress = 'progress_1';
+
+    function updateTimerDisplay(seconds) {
+      const minutes = Math.floor(seconds / 60);
+      const remainingSeconds = seconds % 60;
+
+      const display = `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+      document.getElementById('timeDisplay').innerText = display;
+    }
+
+    function startTimer() {
+      clearInterval(timerInterval);
+      updateTimerDisplay(timeleft);
+
+      timerInterval = setInterval(function() { 
+        timeleft--;
+        const progressAngle = ((1500 - timeleft) / 1500) * 360;
+
+        if (progressAngle > 180 && currentProgress === 'progress_1') {
+          currentProgress = 'progress_2';
+          document.getElementById('progress_1').style.transition = 'none';
+          document.getElementById('progress_2').style.opacity = '1';
+        }
+
+        updateTimer(progressAngle);
+        updateTimerDisplay(timeleft);
+        
+        if(timeleft<=0) {
+          playSound();
+        }
+        
+        if (timeleft <= -1) {
+          clearInterval(timerInterval);
+          document.getElementById('progress_3').style.opacity = '1';
+          timeleft = 0; // 시간을 0으로 설정
+          updateTimerDisplay(timeleft); // 시간을 0으로 표시
+          alert('25분이 종료되었습니다!');
+          resetTimer();
+          return;
+        }
+      }, 1000);
+    }
+
+    function updateTimer(angle) {
+      const progress = document.getElementById(currentProgress);
+      progress.style.transform = `rotate(${angle}deg)`;
+    }
+
+    function stopTimer() {
+      clearInterval(timerInterval);
+    }
+
+    function resetTimer() {
+      clearInterval(timerInterval);
+      timeleft = 1500; // 시간을 1500으로 설정
+      updateTimerDisplay(timeleft); // 시간을 1500으로 표시
+      document.getElementById('progress_1').style.transition = 'transform 1s linear';
+      document.getElementById('progress_1').style.transform = 'rotate(0deg)';
+      document.getElementById('progress_2').style.opacity = '0';
+      document.getElementById('progress_2').style.transform = 'rotate(180deg)';
+      document.getElementById('progress_3').style.opacity = '0';
+      currentProgress = 'progress_1';
+    }
+
+    function playSound() {
+      var audio = new Audio('finish.mp3');
+      audio.play();
+    }
+
+  </script>
+</body>
+</html>
